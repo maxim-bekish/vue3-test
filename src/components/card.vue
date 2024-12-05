@@ -1,19 +1,10 @@
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query';
-import { computed, ref, watch, onMounted } from 'vue';
-import Points from './Points.vue';
-import { getUser } from '../api/api';
+import { computed, ref, watch } from 'vue';
+import { useGetUser } from '../api/query';
 import { getLS, setLS } from '../lib/ls';
 import { useRoute } from 'vue-router';
-
-// Типизация для данных
-interface User {
-	id: number;
-	first_name: string;
-	last_name: string;
-	email: string;
-	avatar: string;
-}
+import { UsersId } from '../types';
+import points from './points.vue';
 
 const route = useRoute();
 
@@ -22,27 +13,29 @@ const idUser = computed(() => {
 	return isNaN(Number(path)) ? 0 : Number(path);
 });
 
-const { data, isLoading, refetch } = useQuery<User>({
-	queryKey: [`user-${idUser.value}`],
-	queryFn: () => getUser(idUser.value),
-});
-const info = computed(() => data.value || null);
-const getCountFromLS = (userId: number) => {
-	const users = getLS('users');
-	return users[userId] || 0;
-};
+const { data, isLoading, refetch } = useGetUser(idUser);
 
-const count = ref(getCountFromLS(idUser.value));
+const users = getLS('users') as UsersId;
+const userData = computed(() => users[idUser.value] || { rating: 0, message: '' });
+
+const count = ref(userData.value.rating);
+const message = ref(userData.value.message);
 
 const changeCount = (isIncrease: boolean) => {
 	count.value += isIncrease ? 1 : -1;
-	let users = getLS('users');
-	users[idUser.value] = count.value;
+};
+
+const updateData = () => {
+	users[idUser.value] = { rating: count.value, message: message.value };
 	setLS('users', users);
 };
 
+const info = computed(() => data.value || null);
+
 watch(idUser, () => {
-	count.value = getCountFromLS(idUser.value);
+	const user = users[idUser.value] || { rating: 0, message: '' };
+	count.value = user.rating;
+	message.value = user.message;
 	refetch();
 });
 </script>
@@ -52,6 +45,7 @@ watch(idUser, () => {
 		<div class="card__img">
 			<img :src="info.avatar" alt="User Avatar" class="card__img-img" />
 		</div>
+
 		<div class="card__content">
 			<div class="card__header">
 				<h2 class="card__name">{{ info.first_name }} {{ info.last_name }}</h2>
@@ -59,11 +53,14 @@ watch(idUser, () => {
 			</div>
 			<points :count="count" @change-count="changeCount" />
 			<div class="card__textarea">
-				<textarea class="card__textarea-field" name="" id="" cols="30" rows="10"></textarea>
+				<textarea
+					v-model="message"
+					placeholder="Message..."
+					class="card__textarea-field"></textarea>
 			</div>
 		</div>
 		<div class="card__btn">
-			<button class="card__btn-save btn btn-primary">save</button>
+			<button @click="updateData" class="card__btn-save btn btn-primary">save</button>
 		</div>
 	</div>
 
@@ -128,6 +125,7 @@ watch(idUser, () => {
 		width: 100%;
 		padding: 5px;
 		outline: none;
+		height: 90px;
 		border-radius: 12px;
 		border-width: 2px;
 		border-color: var(--bg);

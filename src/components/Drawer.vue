@@ -2,63 +2,71 @@
 import { ChevronRight, Search } from 'lucide-vue-next';
 import ItemUser from './ItemUser.vue';
 import Tabs from './Tabs.vue';
-import { useQuery } from '@tanstack/vue-query';
 import { computed, ref } from 'vue';
-import { getUsers } from '../api/api';
+import { useGetUsers } from '../api/query';
+import { getLS } from '../lib/ls';
+import { ITabs, IUser } from '../types';
+import { sortByClients, sortByRating } from '../lib/sort';
+import { filterData } from '../lib/filtr';
 
-interface Users {
-	id: number;
-	first_name: string;
-	last_name: string;
-	email: string;
-	avatar: string;
-}
-const { data, isLoading } = useQuery<Users[]>({
-	queryKey: ['users'],
-	queryFn: getUsers,
-});
+const { data, isLoading } = useGetUsers();
 
-const activeTab = ref('Clients');
-
-console.log(activeTab);
-const show = ref(false);
+const activeTab = ref<ITabs>('clients');
+const search = ref<string>('');
+const show = ref<boolean>(false);
+const localData = computed<IUser>(() => getLS('users'));
 
 const toggleDrawer = () => {
 	show.value = !show.value;
 };
 
-const info = computed(() => data.value || null);
+const info = computed(() => {
+	if (!data.value || !localData.value) {
+		return [];
+	}
 
+	const filteredData = filterData(data.value, search.value);
 
+	const sortFunctions = {
+		rating: () => sortByRating(filteredData, localData.value),
+		clients: () => sortByClients(filteredData),
+	};
+
+	return (sortFunctions[activeTab.value] || (() => filteredData))();
+});
 </script>
 
 <template>
-	<div class="drawer" :class="{ 'drawer--active': show }" v-if="!isLoading && info">
+	<div v-if="!isLoading" class="drawer" :class="{ 'drawer--active': show }">
 		<button @click="toggleDrawer" class="drawer__btn-chevron btn">
-			<chevron-right
+			<ChevronRight
 				:size="16"
 				:style="{ transform: show ? 'rotate(180deg)' : 'rotate(0deg)' }"
 				class="drawer__item-chevron" />
 		</button>
-
 		<div class="drawer__header">
 			<div class="drawer__search">
-				<input type="text" placeholder="Search" class="input" />
-				<button class="drawer__search-btn btn btn-icon">
+				<input type="text" v-model="search" placeholder="Search" class="input" />
+				<button class="drawer__search-btn btn btn-icon" aria-label="Search">
 					<Search :size="16" />
 				</button>
 			</div>
-			<tabs v-model:activeBtn="activeTab" />
+			<Tabs v-model:activeBtn="activeTab" />
 		</div>
 		<div class="drawer__list">
-			<item-user :tab="activeTab" v-for="item in info" :key="item.id" :item="item" />
+			<div v-if="info.length">
+				<item-user :tab="activeTab" v-for="item in info" :key="item.id" :item="item" />
+			</div>
+			<p class="drawer__list-empty" v-else>No results</p>
 		</div>
 
 		<div class="drawer__footer">
 			<button class="btn btn-primary">Update List</button>
 		</div>
 	</div>
-	<div v-else>loading</div>
+	<div v-else-if="isLoading">loading...</div>
+	<div v-else-if="!data || !localData">Error loading data</div>
+	<div v-else>No data available</div>
 </template>
 
 <style lang="scss" scoped>
@@ -112,6 +120,11 @@ const info = computed(() => data.value || null);
 
 	&__list {
 		flex: 1;
+		&-empty {
+			text-align: center;
+			padding-top: 24px;
+			font-size: 20px;
+		}
 	}
 
 	&__btn-chevron {

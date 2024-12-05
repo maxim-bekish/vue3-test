@@ -1,52 +1,27 @@
 <script lang="ts" setup>
 import { ChevronRight } from 'lucide-vue-next';
-import { getLS, setLS } from '../lib/ls';
-import { ref, onMounted, onUnmounted } from 'vue';
-
-interface User {
-  avatar: string;
-  first_name: string;
-  last_name: string;
-  id: number;
-}
+import { getLS } from '../lib/ls';
+import { ref } from 'vue';
+import { IUser, UsersId } from '../types';
 
 defineProps<{
-  item: User;
-  tab: string;
+	item: IUser;
+	tab: string;
 }>();
 
-// Инициализируем переменную из localStorage
-const usersId = ref<any>(getLS('users'));
-
-// Функция для обработки изменения localStorage
-const handleStorageChange = (event: StorageEvent) => {
-  console.log('localStorage "users" updated:', event.newValue);
-  if (event.key === 'users') {
-    // Обновляем значение usersId при изменении в localStorage
-    usersId.value = JSON.parse(event.newValue || '{}');
-  }
-};
-
-onMounted(() => {
-  // Добавляем слушатель события storage для других вкладок
-  window.addEventListener('storage', handleStorageChange);
-});
-
-onUnmounted(() => {
-  // Убираем слушатель при размонтировании компонента
-  window.removeEventListener('storage', handleStorageChange);
-});
+const usersId = ref<UsersId>(getLS('users'));
 </script>
 
 <template>
-  <RouterLink :to="`/${item.id}`" class="block__item">
-    <img v-if="tab === 'clients'" :src="item.avatar" alt="" class="block__item-img" />
-    <p v-if="tab === 'rating'" class="block__item-img">{{ usersId[item.id] }}</p>
-    <p class="block__item-name">{{ item.first_name }} {{ item.last_name }}</p>
-    <ChevronRight :size="16" class="block__item-chevron" />
-  </RouterLink>
+	<RouterLink :to="`/${item.id}`" class="block__item">
+		<div class="block__item-preview">
+			<img v-if="tab === 'clients'" :src="item.avatar" alt="" class="block__item-img" />
+			<p v-if="tab === 'rating'" class="block__item-rating">{{ usersId[item.id].rating }}</p>
+		</div>
+		<p class="block__item-name">{{ item.first_name }} {{ item.last_name }}</p>
+		<ChevronRight :size="16" class="block__item-chevron" />
+	</RouterLink>
 </template>
-
 
 <style lang="scss" scoped>
 .block {
@@ -64,13 +39,23 @@ onUnmounted(() => {
 		&:last-child {
 			border-bottom: none;
 		}
-
+		&-preview {
+			width: 38px;
+			height: 38px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
 		&-img {
+			width: 100%;
+			height: 100%;
 			object-fit: cover;
 			object-position: center;
-			width: 38px;
-			aspect-ratio: 1;
 			border-radius: 35%;
+		}
+		&-rating {
+			font-size: 28px;
+			font-weight: 900;
 		}
 		&-name {
 			font-size: 16px;

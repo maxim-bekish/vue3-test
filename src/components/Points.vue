@@ -2,7 +2,7 @@
 import { Minus, Plus } from 'lucide-vue-next';
 import { defineProps, defineEmits } from 'vue';
 
-const props = defineProps({
+defineProps({
 	count: {
 		type: Number,
 		required: true,
