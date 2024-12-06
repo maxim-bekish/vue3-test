@@ -1,12 +1,19 @@
 <script setup lang="ts">
-import AsideBar from './components/Drawer.vue';
+import { useRoute } from 'vue-router';
+import Drawer from './components/Drawer.vue';
+import { computed } from 'vue';
+const route = useRoute();
+
+const idUser = computed(() => {
+	return route.path === '/';
+});
 </script>
 
 <template>
 	<div class="page">
-		<aside-bar></aside-bar>
-
+	<drawer/>
 		<div class="page__card">
+			<div class="page__card-empty" v-if="idUser">Select a client</div>
 			<router-view></router-view>
 		</div>
 	</div>
@@ -15,13 +22,17 @@ import AsideBar from './components/Drawer.vue';
 <style lang="scss" scoped>
 .page {
 	display: flex;
-	// &__aside {
-	// 	width: 500px;
-	// }
 	&__card {
 		height: 100vh;
 		flex: 1;
 		position: relative;
+		&-empty {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			font-size: 40px;
+		}
 	}
 }
 </style>

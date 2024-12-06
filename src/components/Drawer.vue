@@ -37,31 +37,34 @@ const info = computed(() => {
 </script>
 
 <template>
-	<div v-if="!isLoading" class="drawer" :class="{ 'drawer--active': show }">
+	<div v-if="!isLoading" class="drawer-container" :class="{ 'drawer-container--active': show }">
 		<button @click="toggleDrawer" class="drawer__btn-chevron btn">
 			<ChevronRight
 				:size="16"
 				:style="{ transform: show ? 'rotate(180deg)' : 'rotate(0deg)' }"
 				class="drawer__item-chevron" />
 		</button>
-		<div class="drawer__header">
-			<div class="drawer__search">
-				<input type="text" v-model="search" placeholder="Search" class="input" />
-				<button class="drawer__search-btn btn btn-icon" aria-label="Search">
-					<Search :size="16" />
-				</button>
-			</div>
-			<Tabs v-model:activeBtn="activeTab" />
-		</div>
-		<div class="drawer__list">
-			<div v-if="info.length">
-				<item-user :tab="activeTab" v-for="item in info" :key="item.id" :item="item" />
-			</div>
-			<p class="drawer__list-empty" v-else>No results</p>
-		</div>
 
-		<div class="drawer__footer">
-			<button class="btn btn-primary">Update List</button>
+		<div class="drawer">
+			<div class="drawer__header">
+				<div class="drawer__search">
+					<input type="text" v-model="search" placeholder="Search" class="input" />
+					<button class="drawer__search-btn btn btn-icon" aria-label="Search">
+						<Search :size="16" />
+					</button>
+				</div>
+				<Tabs v-model:activeBtn="activeTab" />
+			</div>
+			<div class="drawer__list">
+				<div v-if="info.length">
+					<item-user :tab="activeTab" v-for="item in info" :key="item.id" :item="item" />
+				</div>
+				<p class="drawer__list-empty" v-else>No results</p>
+			</div>
+
+			<div class="drawer__footer">
+				<button class="btn btn-primary">Update List</button>
+			</div>
 		</div>
 	</div>
 	<div v-else-if="isLoading">loading...</div>
@@ -70,18 +73,24 @@ const info = computed(() => {
 </template>
 
 <style lang="scss" scoped>
+.drawer-container {
+	position: relative;
+	width: 25%;
+	min-width: 250px;
+	transition: all 0.3s ease-in-out;
+	&--active {
+		width: 0%;
+		min-width: 0px;
+	}
+}
 .drawer {
 	height: 100vh;
-
-	width: 25%;
+	overflow: hidden;
 	background-color: var(--white);
 	display: flex;
 	flex-direction: column;
-	position: relative;
 	transition: all 0.3s ease-in-out;
-	&--active {
-		transform: translateX(-100%);
-	}
+
 	&__btn-chevron {
 		height: 24px;
 		z-index: 2;
