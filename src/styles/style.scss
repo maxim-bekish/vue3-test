@@ -6,49 +6,19 @@ body {
 	background-color: var(--bg);
 }
 
-.btn {
-	border: 0;
-	cursor: pointer;
-	outline: none;
-	padding: 0;
-	background: none;
-	transition: all 0.1s ease-in-out;
-	&-primary {
-		background-color: var(--primary);
-		color: var(--white);
-		border-radius: 4px;
-		width: 100%;
-		padding: 12px 14px;
-		text-align: center;
-		&:hover {
-			opacity: 0.8;
-		}
+.scroll {
+	&::-webkit-scrollbar {
+		width: 6px;
 	}
-	&-icon {
-		background-color: var(--white);
-		border-radius: 4px;
-		display: flex;
-		align-items: center;
-		aspect-ratio: 1;
-		justify-content: center;
-		padding: 6px;
+	&::-webkit-scrollbar-track {
+		background: var(--gray);
+		border-radius: 6px;
 	}
-	&-tab {
-		border-radius: 4px;
-		width: 100%;
-		padding-block: 4px;
-		&--active {
-			background-color: var(--white);
-		}
+	&::-webkit-scrollbar-thumb {
+		cursor: pointer;
+		background: var(--primary);
+		border-radius: 5px;
 	}
 }
 
-.input {
-	outline: none;
-	width: 100%;
-	border-radius: 6px;
-	box-shadow: 0 0 4px 0 var(--gray);
-	border: 1px solid var(--gray);
-	padding: 10px 12px;
-	padding-right: 24px;
-}
+$md: 660;

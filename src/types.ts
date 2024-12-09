@@ -12,5 +12,7 @@ interface UserRating {
 	rating: number;
 	message: string;
 }
-
-export type ITabs = 'clients' | 'rating';
+export interface ITab {
+	code: string;
+	name: string;
+}

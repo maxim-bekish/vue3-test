@@ -1,21 +1,25 @@
 <script lang="ts" setup>
 import { ChevronRight, Search } from 'lucide-vue-next';
-import ItemUser from './ItemUser.vue';
-import Tabs from './Tabs.vue';
-import { computed, ref } from 'vue';
+import ListUsers from './ListUsers.vue';
+
+import { computed, ref, watch } from 'vue';
 import { useGetUsers } from '../api/query';
 import { getLS } from '../lib/ls';
-import { ITabs, IUser } from '../types';
 import { sortByClients, sortByRating } from '../lib/sort';
-import { filterData } from '../lib/filtr';
+import { filterData } from '../lib/filter';
+import { IUser } from '../types';
 
 const { data, isLoading } = useGetUsers();
 
-const activeTab = ref<ITabs>('clients');
+const tabs = {
+	clients: { code: '1', name: 'Clients' },
+	rating: { code: '2', name: 'Rating' },
+};
+
+const activeTab = ref(tabs.clients.code);
 const search = ref<string>('');
 const show = ref<boolean>(false);
 const localData = computed<IUser>(() => getLS('users'));
-
 const toggleDrawer = () => {
 	show.value = !show.value;
 };
@@ -24,12 +28,11 @@ const info = computed(() => {
 	if (!data.value || !localData.value) {
 		return [];
 	}
-
 	const filteredData = filterData(data.value, search.value);
 
 	const sortFunctions = {
-		rating: () => sortByRating(filteredData, localData.value),
-		clients: () => sortByClients(filteredData),
+		[tabs.rating.code]: () => sortByRating(filteredData, localData.value),
+		[tabs.clients.code]: () => sortByClients(filteredData),
 	};
 
 	return (sortFunctions[activeTab.value] || (() => filteredData))();
@@ -38,32 +41,22 @@ const info = computed(() => {
 
 <template>
 	<div v-if="!isLoading" class="drawer-container" :class="{ 'drawer-container--active': show }">
-		<button @click="toggleDrawer" class="drawer__btn-chevron btn">
-			<ChevronRight
-				:size="16"
-				:style="{ transform: show ? 'rotate(180deg)' : 'rotate(0deg)' }"
-				class="drawer__item-chevron" />
-		</button>
+		<v-button @click="toggleDrawer" variant="chevron" :active="show">
+			<ChevronRight :size="16" />
+		</v-button>
 
 		<div class="drawer">
 			<div class="drawer__header">
-				<div class="drawer__search">
-					<input type="text" v-model="search" placeholder="Search" class="input" />
-					<button class="drawer__search-btn btn btn-icon" aria-label="Search">
-						<Search :size="16" />
-					</button>
-				</div>
-				<Tabs v-model:activeBtn="activeTab" />
-			</div>
-			<div class="drawer__list">
-				<div v-if="info.length">
-					<item-user :tab="activeTab" v-for="item in info" :key="item.id" :item="item" />
-				</div>
-				<p class="drawer__list-empty" v-else>No results</p>
+				<v-input placeholder="Search" v-model="search" variant="icon">
+					<Search class="drawer__search-btn" :size="16" />
+				</v-input>
+				<v-tabs :tabs="tabs" v-model:activeBtn="activeTab" />
 			</div>
 
+			<list-users :list="info" :activeTab="activeTab"></list-users>
+
 			<div class="drawer__footer">
-				<button class="btn btn-primary">Update List</button>
+				<v-button variant="primary">Update List</v-button>
 			</div>
 		</div>
 	</div>
@@ -78,6 +71,9 @@ const info = computed(() => {
 	width: 25%;
 	min-width: 250px;
 	transition: all 0.3s ease-in-out;
+	@media (max-width: #{$md}px) {
+		width: 100%;
+	}
 	&--active {
 		width: 0%;
 		min-width: 0px;
@@ -91,19 +87,6 @@ const info = computed(() => {
 	flex-direction: column;
 	transition: all 0.3s ease-in-out;
 
-	&__btn-chevron {
-		height: 24px;
-		z-index: 2;
-		background-color: var(--asideBar);
-		position: absolute;
-		top: 0;
-		padding-inline: 2px;
-		border-top-right-radius: 8px;
-		border-bottom-right-radius: 8px;
-		height: 40px;
-		right: 0;
-		transform: translate(100%, 10px);
-	}
 	&__header {
 		width: 100%;
 		background-color: var(--asideBar);
@@ -111,33 +94,6 @@ const info = computed(() => {
 		display: flex;
 		flex-direction: column;
 		gap: 16px;
-	}
-
-	&__search {
-		position: relative;
-		display: flex;
-		align-items: center;
-		overflow: hidden;
-
-		&-btn {
-			border: 0;
-			position: absolute;
-			right: 0;
-			height: 34px;
-		}
-	}
-
-	&__list {
-		flex: 1;
-		&-empty {
-			text-align: center;
-			padding-top: 24px;
-			font-size: 20px;
-		}
-	}
-
-	&__btn-chevron {
-		color: var(--primary);
 	}
 
 	&__footer {

@@ -4,7 +4,7 @@ import { useGetUser } from '../api/query';
 import { getLS, setLS } from '../lib/ls';
 import { useRoute } from 'vue-router';
 import { UsersId } from '../types';
-import points from './points.vue';
+import Points from './Points.vue';
 
 const route = useRoute();
 
@@ -42,10 +42,7 @@ watch(idUser, () => {
 
 <template>
 	<div v-if="!isLoading && info" class="card">
-		<div class="card__img">
-			<img :src="info.avatar" alt="User Avatar" class="card__img-img" />
-		</div>
-
+		<v-avatar class="card__img" :size="130" :src="info.avatar" />
 		<div class="card__content">
 			<div class="card__header">
 				<h2 class="card__name">{{ info.first_name }} {{ info.last_name }}</h2>
@@ -53,14 +50,14 @@ watch(idUser, () => {
 			</div>
 			<points :count="count" @change-count="changeCount" />
 			<div class="card__textarea">
-				<textarea
+				<v-textarea
 					v-model="message"
 					placeholder="Message..."
-					class="card__textarea-field"></textarea>
+					class="card__textarea-field"></v-textarea>
 			</div>
 		</div>
 		<div class="card__btn">
-			<button @click="updateData" class="card__btn-save btn btn-primary">save</button>
+			<v-button @click="updateData" variant="primary">Save</v-button>
 		</div>
 	</div>
 
@@ -84,19 +81,18 @@ watch(idUser, () => {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+	box-shadow: 0 0 12px 0px var(--gray);
+
+	@media (max-width: #{$md}px) {
+		grid-template-columns: 1fr;
+		grid-template-rows: repeat(3, auto);
+		width: 100%;
+		height: 100vh;
+		border-radius: 0;
+	}
 
 	&__img {
-		overflow: hidden;
-		border-radius: 12px;
-		width: 130px;
-		aspect-ratio: 1;
 		grid-area: 1 / 1 / 2 / 2;
-		img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			object-position: center;
-		}
 	}
 	&__content {
 		grid-area: 1 / 2 / 2 / 3;
@@ -104,36 +100,36 @@ watch(idUser, () => {
 		width: 100%;
 		flex-direction: column;
 		gap: 20px;
+		@media (max-width: #{$md}px) {
+			grid-area: 2 / 1 / 3 / 2;
+		}
 	}
 	&__header {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
 	}
 	&__name {
 		font-weight: 700;
 		font-size: 32px;
+		@media (max-width: #{$md}px) {
+			font-size: 20px;
+		}
 	}
 	&__email {
 		font-weight: 500;
 		font-size: 22px;
+		@media (max-width: #{$md}px) {
+			font-size: 16px;
+		}
 	}
 
-	&__points-value {
-	}
-	&__textarea {
-	}
-	&__textarea-field {
-		max-height: 100px;
-		width: 100%;
-		padding: 5px;
-		outline: none;
-		height: 90px;
-		border-radius: 12px;
-		border-width: 2px;
-		border-color: var(--bg);
-		resize: none;
-	}
 	&__btn {
 		width: 70%;
 		grid-area: 2 / 1 / 3 / 3;
+		@media (max-width: #{$md}px) {
+			grid-area: 3 / 1 / 4 / 2;
+		}
 	}
 }
 </style>

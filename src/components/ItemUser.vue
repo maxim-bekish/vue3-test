@@ -8,22 +8,26 @@ defineProps<{
 	item: IUser;
 	tab: string;
 }>();
-
+const activeItemId = ref(null);
 const usersId = ref<UsersId>(getLS('users'));
 </script>
 
 <template>
-	<RouterLink :to="`/${item.id}`" class="block__item">
+	<RouterLink :to="`/${item.id}`" class="block__item" :class="{ activeItemId }">
 		<div class="block__item-preview">
-			<img v-if="tab === 'clients'" :src="item.avatar" alt="" class="block__item-img" />
-			<p v-if="tab === 'rating'" class="block__item-rating">{{ usersId[item.id].rating }}</p>
+			<v-avatar v-if="tab === '1'" class="card__img" :size="38" :src="item.avatar" />
+			<p v-if="tab === '2'" class="block__item-rating">{{ usersId[item.id].rating }}</p>
 		</div>
 		<p class="block__item-name">{{ item.first_name }} {{ item.last_name }}</p>
+
 		<ChevronRight :size="16" class="block__item-chevron" />
 	</RouterLink>
 </template>
 
 <style lang="scss" scoped>
+.router-link-active {
+	background-color: var(--gray);
+}
 .block {
 	&__item {
 		cursor: pointer;
@@ -32,10 +36,12 @@ const usersId = ref<UsersId>(getLS('users'));
 		align-items: center;
 		gap: 12px;
 		transition: all 0.1s ease-in-out;
-		&:hover {
-			background-color: var(--gray);
-		}
 		border-bottom: 1px solid var(--gray);
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--gray);
+			}
+		}
 		&:last-child {
 			border-bottom: none;
 		}
@@ -45,13 +51,6 @@ const usersId = ref<UsersId>(getLS('users'));
 			display: flex;
 			align-items: center;
 			justify-content: center;
-		}
-		&-img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-			object-position: center;
-			border-radius: 35%;
 		}
 		&-rating {
 			font-size: 28px;

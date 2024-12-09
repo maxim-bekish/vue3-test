@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import Drawer from './components/Drawer.vue';
+import Drawer from '../components/Drawer.vue';
 import { computed } from 'vue';
 const route = useRoute();
 
@@ -11,7 +11,7 @@ const idUser = computed(() => {
 
 <template>
 	<div class="page">
-	<drawer/>
+		<drawer />
 		<div class="page__card">
 			<div class="page__card-empty" v-if="idUser">Select a client</div>
 			<router-view></router-view>
@@ -22,10 +22,12 @@ const idUser = computed(() => {
 <style lang="scss" scoped>
 .page {
 	display: flex;
+
 	&__card {
 		height: 100vh;
 		flex: 1;
 		position: relative;
+
 		&-empty {
 			position: absolute;
 			top: 50%;

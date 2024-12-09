@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 
-import card from './components/card.vue';
+import card from './components/Card.vue';
 
 const routes = [
 	{

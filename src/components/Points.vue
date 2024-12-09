@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { Minus, Plus } from 'lucide-vue-next';
-import { defineProps, defineEmits } from 'vue';
 
 defineProps({
 	count: {
@@ -19,13 +18,13 @@ const handleChange = (isIncrease: boolean) => {
 
 <template>
 	<div class="card__points">
-		<button @click="handleChange(false)" class="card__button card__button--decrease btn btn-icon">
+		<v-button @click="handleChange(false)" variant="icon">
 			<Minus :size="12" />
-		</button>
+		</v-button>
 		<span class="card__points-value">{{ count }} points</span>
-		<button @click="handleChange(true)" class="card__button card__button--increase btn btn-icon">
+		<v-button @click="handleChange(true)" variant="icon">
 			<Plus :size="12" />
-		</button>
+		</v-button>
 	</div>
 </template>
 
