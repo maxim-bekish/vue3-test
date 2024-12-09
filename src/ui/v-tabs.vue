@@ -21,7 +21,6 @@ const emit = defineEmits<{
 
 <template>
   <div class="block__tabs">
-    <!-- Преобразуем объект в массив значений -->
     <v-button
       v-for="tab in Object.values(tabs)" 
       :key="tab.code"

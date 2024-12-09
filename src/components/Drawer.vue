@@ -60,7 +60,8 @@ const info = computed(() => {
 			</div>
 		</div>
 	</div>
-	<div v-else-if="isLoading">loading...</div>
+
+	<v-loader v-else-if="isLoading" />
 	<div v-else-if="!data || !localData">Error loading data</div>
 	<div v-else>No data available</div>
 </template>

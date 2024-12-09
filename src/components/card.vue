@@ -61,7 +61,8 @@ watch(idUser, () => {
 		</div>
 	</div>
 
-	<div v-else-if="isLoading">loading...</div>
+	<v-loader v-else-if="isLoading"></v-loader>
+
 </template>
 
 <style lang="scss" scoped>
